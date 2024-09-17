@@ -1,210 +1,58 @@
 <html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>Calculator</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    .calculator {
-      width: 400px;
-    }
-    .screen {
-      height: 50px;
-      border: 1px solid black;
-      text-align: right;
-      font-size: 30px;
-      line-height: 50px;
-      padding-right: 10px;
-    }
-    .key-pad {
-      display: flex;
-    }
-    .num-keys {
-      display: flex;
-      flex-wrap: wrap;
-      width: 300px;
-    }
-    .num-keys button {
-      width: 90px;
-    }
-  </style>
+
+<link rel="stylesheet" href="styles/styles.css" />
+<script src="scripts/jquery.js"></script>
+<script src="scripts/keyboard.js" ></script>
+<script src="scripts/locations.js"> </script>
+
 </head>
+
 <body>
-  <div class="calculator">
-    <p id="screen" class="screen">0</p>
-    <div id="key-pad" class="key-pad">
-      <div class="num-keys">
-        <button>1</button>
-        <button>2</button>
-        <button>3</button>
-        <button>4</button>
-        <button>5</button>
-        <button>6</button>
-        <button>7</button>
-        <button>8</button>
-        <button>9</button>
-        <button>0</button>
-      </div>
-      <div>
-        <button>+</button>
-        <button>-</button>
-        <button>*</button>
-        <button>/</button>
-        <button>=</button>
-      </div>
-    </div>
+
+<div id='screen'>
+
+  <div id='borderTop'>
   </div>
-  <script>
-    class Stack {
-      constructor() {
-        this.stack = [];
-        this[Symbol.iterator] = function *() {
-          for (const el of this.stack) {
-            yield el;
-          }
-        }
-      }
+  <div id='borderLeft'>
+  </div>
+  <div id='borderRight'>
+  </div>
+  <div id='borderDown'>
+  </div>
 
-      isEmpty() {
-        return this.stack.length === 0;
-      }
+  <div id='up'>
+  </div>
 
-      push(val) {
-        this.stack.push(val);
-      }
+  <div id='down'>
+  </div>
 
-      pop() {
-        if (this.isEmpty()) {
-          throw new Error('empty stack');
-        } else {
-          return this.stack.pop();
-        }
-      }
+    <div id='blackScreen'>
+    </div>
 
-      peek(n = -1) {
-        if (this.isEmpty()) {
-          throw new Error('empty stack');
-        } else {
-          return this.stack[this.stack.length + n];
-        }
-      }
-    }
+    <div id='location'>
 
-    document.getElementById('key-pad').addEventListener('click', (event) => {
-      if (event.target.tagName === 'BUTTON') {
-        input(event.target.innerHTML);
-        render();
-      }
-    });
+      <div id='player'>
 
-    const $screen = document.getElementById('screen');
-    const stack = new Stack();
-    let shouldResetIfNumber = false;
-    let display = 0;
+      </div>
 
-    stack.push(0);
+    </div>
 
-    function input(char) {
-      if (isNum(char)) {
-        if (shouldResetIfNumber) {
-          stack.pop();
-          stack.push(parseInt(char));
-          shouldResetIfNumber = false;
-        } else if (isNum(stack.peek())) {
-          const n = stack.pop();
-          stack.push(n * 10 + parseInt(char));
-        } else {
-          stack.push(parseInt(char));
-        }
-        display = stack.peek();
-      } else if (char !== '=') {
-        shouldResetIfNumber = false;
-        if (isNum(stack.peek())) {
-          stack.push(char);
-        } else {
-          stack.pop();
-          stack.push(char);
-        }
-        display = evaluate(stack);
-      } else {
-        const res = evaluate(stack, true);
-        while (!stack.isEmpty()) {
-          stack.pop();
-        }
-        stack.push(res);
-        shouldResetIfNumber = true;
-        display = res;
-      }
-    }
+    <audio src="" autostart=false width=1 height=1 id="soundOfGame"></audio>
 
-    function evaluate(stack, isComplete = false) {
-      const values = new Stack();
-      const operators = new Stack();
-      for (const val of stack) {
-        if (isNum(val)) {
-          values.push(val);
-        } else {
-          if (val === '+' || val === '-') {
-            while (!operators.isEmpty()) {
-              values.push(operators.pop());
-            }
-            operators.push(val);
-          } else {
-            while (!operators.isEmpty() && (operators.peek() === '*' || operators.peek() === '/')) {
-              values.push(operators.pop());
-            }
-            operators.push(val);
-          }
-        }
-      }
+</div>
 
-      if (isComplete) {
-        while (!operators.isEmpty()) {
-          values.push(operators.pop());
-        }
-      }
+<p>Location: <span id='locationOfPlayer'></span></p>
 
-      const rpn = new Stack();
-      for (const val of values) {
-        if (isNum(val)) {
-          rpn.push(val);
-        } else {
-          const b = rpn.pop();
-          const a = rpn.pop();
-          switch (val) {
-            case '+':
-              rpn.push(a + b);
-              break;
-            case '-':
-              rpn.push(a - b);
-              break;
-            case '/':
-              rpn.push(a / b);
-              break;
-            case '*':
-              rpn.push(a * b);
-              break;
-          }
-        }
-      }
+<p>Position: <span id='positionOfPlayer'></span></p>
 
-      return rpn.pop();
-    }
-
-    function render() {
-      $screen.innerHTML = display;
-    }
-
-    function isNum(val) {
-      if (typeof val === 'number') {
-        return true;
-      } else if (typeof val === 'string') {
-        return !Number.isNaN(parseInt(val));
-      } else {
-        return false;
-      }
-    }
-  </script>
 </body>
+
+<script>
+
+loadLocation("locations/route_1.txt",true);
+
+</script>
+
 </html>
